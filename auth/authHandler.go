@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/fridrock/avito-shop/api"
+	"github.com/fridrock/avito-shop/storage"
 	"github.com/fridrock/avito-shop/utils"
 	"github.com/google/uuid"
 )
@@ -15,7 +16,7 @@ type AuthHandler interface {
 }
 
 type AuthHandlerImpl struct {
-	storage        AuthStorage
+	storage        storage.UserStorage
 	tokenService   TokenService
 	passwordHasher utils.PasswordHasher
 }
@@ -39,7 +40,7 @@ func (ah *AuthHandlerImpl) Auth(w http.ResponseWriter, r *http.Request) (int, er
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
-			user = User{
+			user = storage.User{
 				Username:       authRequest.Username,
 				HashedPassword: hashedPassword,
 			}
@@ -60,9 +61,9 @@ func (ah *AuthHandlerImpl) sendToken(w http.ResponseWriter, authRequest api.Auth
 	}
 	return utils.WriteEncoded(w, authResponse)
 }
-func NewAuthHandler(storage AuthStorage, tokenService TokenService) AuthHandler {
+func NewAuthHandler(st storage.UserStorage, tokenService TokenService) AuthHandler {
 	return &AuthHandlerImpl{
-		storage:        storage,
+		storage:        st,
 		tokenService:   tokenService,
 		passwordHasher: utils.NewPasswordHasher(),
 	}

@@ -2,11 +2,12 @@ package coinsend
 
 import (
 	"errors"
-	"log/slog"
+	"fmt"
 	"net/http"
 
 	"github.com/fridrock/avito-shop/api"
 	"github.com/fridrock/avito-shop/auth"
+	"github.com/fridrock/avito-shop/storage"
 	"github.com/fridrock/avito-shop/utils"
 )
 
@@ -15,7 +16,8 @@ type SendCoinHandler interface {
 }
 
 type SendCoinHandlerImpl struct {
-	storage SendCoinStorage
+	coinStorage storage.CoinStorage
+	userStorage storage.UserStorage
 }
 
 func (sc *SendCoinHandlerImpl) SendCoin(w http.ResponseWriter, r *http.Request) (int, error) {
@@ -23,20 +25,32 @@ func (sc *SendCoinHandlerImpl) SendCoin(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
-	slog.Info("Got message")
-	err = sc.storage.SendCoin(sendCoinRequest, auth.UserFromContext(r.Context()))
+	//get user balance
+	curUserId := auth.UserFromContext(r.Context())
+	hasEnoughCoins := sc.userStorage.CheckEnoughCoins(sendCoinRequest.Amount, curUserId)
+	//user with toUser username exist
+	toUser, err := sc.userStorage.FindUserByUsername(sendCoinRequest.ToUser)
+	resError := err
+	if !hasEnoughCoins {
+		resError = errors.Join(resError, fmt.Errorf("doesn't have such amount of coins of account"))
+	}
+	if curUserId.String() == toUser.Id.String() {
+		resError = errors.Join(resError, fmt.Errorf("can't send coin to yourself"))
+	}
+	if resError != nil {
+		return http.StatusBadRequest, resError
+	}
+
+	err = sc.coinStorage.SendCoin(sendCoinRequest.Amount, auth.UserFromContext(r.Context()), toUser.Id)
 	if err != nil {
-		if errors.Is(err, WrongData) {
-			return http.StatusBadRequest, err
-		}
 		return http.StatusInternalServerError, err
 	}
-	slog.Info("success")
 	return http.StatusOK, nil
 }
 
-func NewSendCoinHandler(storage SendCoinStorage) SendCoinHandler {
+func NewSendCoinHandler(cs storage.CoinStorage, us storage.UserStorage) SendCoinHandler {
 	return &SendCoinHandlerImpl{
-		storage: storage,
+		coinStorage: cs,
+		userStorage: us,
 	}
 }
