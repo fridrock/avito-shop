@@ -11,12 +11,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type TokenDto struct {
-	tokenString string
-}
-
 type TokenService interface {
-	GenerateToken(api.AuthRequest, uuid.UUID) (TokenDto, error)
+	GenerateToken(api.AuthRequest, uuid.UUID) (api.AuthResponse, error)
 	ValidateToken(string) (api.UserInfo, error)
 }
 
@@ -25,13 +21,13 @@ type TokenServiceImpl struct {
 	REFRESH_KEY string
 }
 
-func (ts *TokenServiceImpl) GenerateToken(authRequest api.AuthRequest, userId uuid.UUID) (TokenDto, error) {
-	var dto TokenDto
+func (ts *TokenServiceImpl) GenerateToken(authRequest api.AuthRequest, userId uuid.UUID) (api.AuthResponse, error) {
+	var dto api.AuthResponse
 	accessTokenString, err := ts.generateAccess(authRequest, userId)
 	if err != nil {
 		return dto, err
 	}
-	dto.tokenString = accessTokenString
+	dto.Token = accessTokenString
 	return dto, nil
 }
 

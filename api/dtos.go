@@ -19,10 +19,10 @@ type CoinHistoryDto struct {
 }
 
 type InfoResponse struct {
-	Coins       int              `json:"coins" validate:"required"`
-	Inventory   []MerchDto       `json:"inventory" validate: "required"`
-	CoinHistory []CoinHistoryDto `json:"coinHistory" validate: "required"`
-	Sent        []CoinHistoryDto `json:"sent" validate:"required"`
+	Coins       int              `json:"coins"`
+	Inventory   []MerchDto       `json:"inventory"`
+	CoinHistory []CoinHistoryDto `json:"coinHistory"`
+	Sent        []CoinHistoryDto `json:"sent"`
 }
 
 type ErrorResponse struct {
@@ -32,6 +32,10 @@ type ErrorResponse struct {
 type AuthRequest struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
+}
+
+type AuthResponse struct {
+	Token string `json:"token"`
 }
 
 type SendCoinRequest struct {
