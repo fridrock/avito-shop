@@ -7,10 +7,9 @@ type UserInfo struct {
 	Username string
 }
 
-// TODO make validation rules
 type MerchDto struct {
-	Type      string
-	Quanitity int
+	Type      string `db:"type"`
+	Quanitity int    `db:"quantity"`
 }
 
 type CoinHistoryDto struct {
