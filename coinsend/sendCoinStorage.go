@@ -20,6 +20,7 @@ type SendCoinStorageImpl struct {
 	db *sqlx.DB
 }
 
+// TODO refactor
 func (sc *SendCoinStorageImpl) SendCoin(sendCoinRequest api.SendCoinRequest, curUserId uuid.UUID) error {
 	tx, err := sc.db.Begin()
 	if err != nil {
@@ -27,8 +28,15 @@ func (sc *SendCoinStorageImpl) SendCoin(sendCoinRequest api.SendCoinRequest, cur
 	}
 	//removing coins from current user
 	q := `UPDATE users SET coins = coins - $1 WHERE id = $2 AND coins - $1 > 0`
-	_, err = tx.Exec(q, sendCoinRequest.Amount, curUserId.String())
+	res, err := tx.Exec(q, sendCoinRequest.Amount, curUserId.String())
 	if err != nil {
+		return err
+	}
+	aff, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if int(aff) == 0 {
 		return WrongData
 	}
 	//getting user to append coins

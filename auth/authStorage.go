@@ -9,6 +9,7 @@ type User struct {
 	Id             uuid.UUID `db:"id"`
 	Username       string    `db:"username"`
 	HashedPassword string    `db:"hashed_password"`
+	Coins          int       `db:"coins"`
 }
 
 type AuthStorage interface {

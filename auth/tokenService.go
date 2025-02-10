@@ -17,8 +17,7 @@ type TokenService interface {
 }
 
 type TokenServiceImpl struct {
-	SECRET_KEY  []byte
-	REFRESH_KEY string
+	SECRET_KEY []byte
 }
 
 func (ts *TokenServiceImpl) GenerateToken(authRequest api.AuthRequest, userId uuid.UUID) (api.AuthResponse, error) {
@@ -101,13 +100,8 @@ func NewTokenService() TokenService {
 	if !exists {
 		log.Fatalf("Can't load env variable: %v", varName)
 	}
-	varName = "REFRESH_KEY"
-	refresh, exists := os.LookupEnv(varName)
-	if !exists {
-		log.Fatalf("Can't load env variable: %v", varName)
-	}
+
 	return &TokenServiceImpl{
-		SECRET_KEY:  []byte(secret),
-		REFRESH_KEY: refresh,
+		SECRET_KEY: []byte(secret),
 	}
 }

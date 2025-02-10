@@ -2,6 +2,7 @@ package auth
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/fridrock/avito-shop/api"
@@ -30,9 +31,8 @@ func (ah *AuthHandlerImpl) Auth(w http.ResponseWriter, r *http.Request) (int, er
 		if ah.passwordHasher.CheckPassword(authRequest.Password, user.HashedPassword) {
 			return ah.sendToken(w, authRequest, user.Id)
 		} else {
-			return http.StatusUnauthorized, err
+			return http.StatusUnauthorized, fmt.Errorf("wrong password")
 		}
-		// Регистрация
 	} else {
 		if err == sql.ErrNoRows {
 			hashedPassword, err := ah.passwordHasher.HashPassword(authRequest.Password)
