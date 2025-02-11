@@ -44,6 +44,18 @@ func TestAuthRequestInvalid(t *testing.T) {
 
 }
 
+func TestInvalidEncoding(t *testing.T) {
+	authRequest := `{"username:true"}`
+	req, err := requestFromJson(authRequest)
+	if err != nil {
+		t.Fatalf("Could not create request: %v", err)
+	}
+	_, err = Parse[api.AuthRequest](req)
+	if err == nil {
+		t.Fatalf("Read wrong value type")
+	}
+}
+
 func TestSendCoin(t *testing.T) {
 	sendCoin := `{"toUser":"someUsername","amount":12}`
 	req, err := requestFromJson(sendCoin)
