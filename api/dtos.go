@@ -12,16 +12,20 @@ type MerchDto struct {
 	Quanitity int    `db:"quantity"`
 }
 
-type CoinHistoryDto struct {
-	Username string
-	Amount   int
+type FromUserDto struct {
+	FromUser string `db:"fromUser"`
+	Amount   int    `db:"amount"`
+}
+type ToUserDto struct {
+	ToUser string `db:"toUser"`
+	Amount int    `db:"amount"`
 }
 
 type InfoResponse struct {
-	Coins       int              `json:"coins"`
-	Inventory   []MerchDto       `json:"inventory"`
-	CoinHistory []CoinHistoryDto `json:"coinHistory"`
-	Sent        []CoinHistoryDto `json:"sent"`
+	Coins       int           `json:"coins"`
+	Inventory   []MerchDto    `json:"inventory"`
+	CoinHistory []FromUserDto `json:"coinHistory"`
+	Sent        []ToUserDto   `json:"sent"`
 }
 
 type ErrorResponse struct {

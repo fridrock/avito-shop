@@ -1,21 +1,32 @@
 package getinfo
 
-import "net/http"
+import (
+	"net/http"
 
-type GetInfoHandler interface {
+	"github.com/fridrock/avito-shop/auth"
+	"github.com/fridrock/avito-shop/storage"
+	"github.com/fridrock/avito-shop/utils"
+)
+
+type InfoHandler interface {
 	GetInfo(w http.ResponseWriter, r *http.Request) (int, error)
 }
 
-type GetInfoHandlerImpl struct {
-	storage GetInfoStorage
+type InfoHandlerImpl struct {
+	infoStorage storage.InfoStorage
 }
 
-func (gi *GetInfoHandlerImpl) GetInfo(w http.ResponseWriter, r *http.Request) (int, error) {
-	return 0, nil
+func (ih *InfoHandlerImpl) GetInfo(w http.ResponseWriter, r *http.Request) (int, error) {
+	userId := auth.UserFromContext(r.Context())
+	res, err := ih.infoStorage.GetInfoResponse(userId)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return utils.WriteEncoded(w, res)
 }
 
-func NewGetInfoHandler(storage GetInfoStorage) GetInfoHandler {
-	return &GetInfoHandlerImpl{
-		storage: storage,
+func NewInfoHandler(is storage.InfoStorage) InfoHandler {
+	return &InfoHandlerImpl{
+		infoStorage: is,
 	}
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -35,7 +36,7 @@ func (ah *AuthHandlerImpl) Auth(w http.ResponseWriter, r *http.Request) (int, er
 			return http.StatusUnauthorized, fmt.Errorf("wrong password")
 		}
 	} else {
-		if err == sql.ErrNoRows {
+		if errors.As(err, &sql.ErrNoRows) {
 			hashedPassword, err := ah.passwordHasher.HashPassword(authRequest.Password)
 			if err != nil {
 				return http.StatusInternalServerError, err
