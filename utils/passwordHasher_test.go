@@ -5,7 +5,7 @@ import (
 )
 
 func Test_checkPassword(t *testing.T) {
-	hasher := PasswordHasherImpl{}
+	hasher := NewPasswordHasher()
 	password := "really long and strong password"
 	hash, err := hasher.HashPassword(password)
 	if err != nil {

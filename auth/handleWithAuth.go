@@ -14,10 +14,10 @@ import (
 
 type UserContextKey string
 
-const key UserContextKey = "user"
+const Key UserContextKey = "user"
 
 func UserFromContext(ctx context.Context) uuid.UUID {
-	return ctx.Value(key).(uuid.UUID)
+	return ctx.Value(Key).(uuid.UUID)
 }
 
 type AuthManager interface {
@@ -61,7 +61,7 @@ func (am AuthManagerImpl) AuthMiddleware(h utils.HandlerWithError) utils.Handler
 			slog.Debug(err.Error())
 			return http.StatusUnauthorized, err
 		}
-		ctx := context.WithValue(r.Context(), key, user.Id)
+		ctx := context.WithValue(r.Context(), Key, user.Id)
 		return h(w, r.WithContext(ctx))
 	}
 }
