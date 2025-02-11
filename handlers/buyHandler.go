@@ -19,6 +19,7 @@ type BuyHandlerImpl struct {
 }
 
 func (bh *BuyHandlerImpl) Buy(w http.ResponseWriter, r *http.Request) (int, error) {
+
 	userId := auth.UserFromContext(r.Context())
 	itemName := mux.Vars(r)["item"]
 	if itemName == "" {
