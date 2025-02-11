@@ -18,7 +18,7 @@ import (
 )
 
 func TestBuyEmptyItemName(t *testing.T) {
-	_, _, _, buyHandler, req := prepare(t)
+	_, _, _, buyHandler, req := prepareBuy(t)
 
 	status, err := buyHandler.Buy(httptest.NewRecorder(), req)
 
@@ -27,7 +27,7 @@ func TestBuyEmptyItemName(t *testing.T) {
 }
 
 func TestBuyNonExistingItem(t *testing.T) {
-	_, _, productStorage, buyHandler, req := prepare(t)
+	_, _, productStorage, buyHandler, req := prepareBuy(t)
 	productStorage.On("FindProductByName", "name").Return(storage.Product{}, errors.Join(sql.ErrNoRows, fmt.Errorf("no such product")))
 	req = mux.SetURLVars(req, map[string]string{"item": "name"})
 
@@ -38,7 +38,7 @@ func TestBuyNonExistingItem(t *testing.T) {
 }
 
 func TestBuyNotEnoughMoney(t *testing.T) {
-	userId, userStorage, productStorage, buyHandler, req := prepare(t)
+	userId, userStorage, productStorage, buyHandler, req := prepareBuy(t)
 	req = mux.SetURLVars(req, map[string]string{"item": "name"})
 	userStorage.On("CheckEnoughCoins", 100, userId).Return(false)
 	productStorage.On("FindProductByName", "name").Return(storage.Product{
@@ -52,7 +52,7 @@ func TestBuyNotEnoughMoney(t *testing.T) {
 }
 
 func TestBuyErrorInTransaction(t *testing.T) {
-	userId, userStorage, productStorage, buyHandler, req := prepare(t)
+	userId, userStorage, productStorage, buyHandler, req := prepareBuy(t)
 	req = mux.SetURLVars(req, map[string]string{"item": "name"})
 	userStorage.On("CheckEnoughCoins", 100, userId).Return(true)
 	productStorage.On("FindProductByName", "name").Return(storage.Product{
@@ -65,7 +65,7 @@ func TestBuyErrorInTransaction(t *testing.T) {
 }
 
 func TestBuySuccess(t *testing.T) {
-	userId, userStorage, productStorage, buyHandler, req := prepare(t)
+	userId, userStorage, productStorage, buyHandler, req := prepareBuy(t)
 	req = mux.SetURLVars(req, map[string]string{"item": "name"})
 	userStorage.On("CheckEnoughCoins", 100, userId).Return(true)
 	productStorage.On("FindProductByName", "name").Return(storage.Product{
@@ -79,16 +79,16 @@ func TestBuySuccess(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func prepare(t *testing.T) (uuid.UUID, *mocks.UserStorage, *mocks.ProductStorage, BuyHandler, *http.Request) {
+func prepareBuy(t *testing.T) (uuid.UUID, *mocks.UserStorage, *mocks.ProductStorage, BuyHandler, *http.Request) {
 	userStorage := mocks.NewUserStorage(t)
 	productStorage := mocks.NewProductStorage(t)
 	buyHandler := NewBuyHandler(productStorage, userStorage)
 	userId := uuid.New()
-	req := prepareRequest(userId)
+	req := prepareBuyRequest(userId)
 	return userId, userStorage, productStorage, buyHandler, req
 }
 
-func prepareRequest(userId uuid.UUID) *http.Request {
+func prepareBuyRequest(userId uuid.UUID) *http.Request {
 	req := httptest.NewRequest("GET", "/api/buy/name", nil)
 	return req.WithContext(context.WithValue(req.Context(), auth.Key, userId))
 }
