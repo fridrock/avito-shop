@@ -1,4 +1,4 @@
-package coinsend
+package handlers
 
 import (
 	"errors"

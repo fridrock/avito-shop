@@ -1,4 +1,4 @@
-package auth
+package handlers
 
 import (
 	"database/sql"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/fridrock/avito-shop/api"
+	"github.com/fridrock/avito-shop/auth"
 	"github.com/fridrock/avito-shop/storage"
 	"github.com/fridrock/avito-shop/utils"
 	"github.com/google/uuid"
@@ -18,7 +19,7 @@ type AuthHandler interface {
 
 type AuthHandlerImpl struct {
 	storage        storage.UserStorage
-	tokenService   TokenService
+	tokenService   auth.TokenService
 	passwordHasher utils.PasswordHasher
 }
 
@@ -36,7 +37,7 @@ func (ah *AuthHandlerImpl) Auth(w http.ResponseWriter, r *http.Request) (int, er
 			return http.StatusUnauthorized, fmt.Errorf("wrong password")
 		}
 	} else {
-		if errors.As(err, &sql.ErrNoRows) {
+		if errors.As(err, sql.ErrNoRows) {
 			hashedPassword, err := ah.passwordHasher.HashPassword(authRequest.Password)
 			if err != nil {
 				return http.StatusInternalServerError, err
@@ -62,7 +63,7 @@ func (ah *AuthHandlerImpl) sendToken(w http.ResponseWriter, authRequest api.Auth
 	}
 	return utils.WriteEncoded(w, authResponse)
 }
-func NewAuthHandler(st storage.UserStorage, tokenService TokenService) AuthHandler {
+func NewAuthHandler(st storage.UserStorage, tokenService auth.TokenService) AuthHandler {
 	return &AuthHandlerImpl{
 		storage:        st,
 		tokenService:   tokenService,

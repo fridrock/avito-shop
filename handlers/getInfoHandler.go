@@ -1,4 +1,4 @@
-package getinfo
+package handlers
 
 import (
 	"net/http"

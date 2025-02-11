@@ -1,4 +1,4 @@
-package buy
+package handlers
 
 import (
 	"fmt"

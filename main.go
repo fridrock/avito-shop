@@ -6,10 +6,8 @@ import (
 	"time"
 
 	"github.com/fridrock/avito-shop/auth"
-	"github.com/fridrock/avito-shop/buy"
-	"github.com/fridrock/avito-shop/coinsend"
 	"github.com/fridrock/avito-shop/db"
-	"github.com/fridrock/avito-shop/getinfo"
+	"github.com/fridrock/avito-shop/handlers"
 	"github.com/fridrock/avito-shop/storage"
 	"github.com/fridrock/avito-shop/utils"
 	"github.com/gorilla/mux"
@@ -20,14 +18,14 @@ func main() {
 	defer conn.Close()
 	userStorage := storage.NewUserStorage(conn)
 	tokenService := auth.NewTokenService()
-	authHandler := auth.NewAuthHandler(userStorage, tokenService)
+	authHandler := handlers.NewAuthHandler(userStorage, tokenService)
 	authManager := auth.NewAuthManager(tokenService)
 	coinStorage := storage.NewCoinStorage(conn)
-	sendCoinHandler := coinsend.NewSendCoinHandler(coinStorage, userStorage)
+	sendCoinHandler := handlers.NewSendCoinHandler(coinStorage, userStorage)
 	productStorage := storage.NewProductStorage(conn)
 	infoStorage := storage.NewInfoStorage(conn)
-	infoHandler := getinfo.NewInfoHandler(infoStorage)
-	buyHandler := buy.NewBuyHandler(productStorage, userStorage)
+	infoHandler := handlers.NewInfoHandler(infoStorage)
+	buyHandler := handlers.NewBuyHandler(productStorage, userStorage)
 	router := mux.NewRouter()
 	router.Handle("/api/auth", utils.HandleErrorMiddleware(authHandler.Auth)).Methods("POST")
 	router.Handle("/api/sendCoin", utils.HandleErrorMiddleware(authManager.AuthMiddleware(sendCoinHandler.SendCoin))).Methods("POST")
