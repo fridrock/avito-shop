@@ -3,9 +3,11 @@ package testdbsetup
 import (
 	"context"
 	"log"
+	"log/slog"
 	"path/filepath"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -45,4 +47,18 @@ func GetDatabaseContainer(prefix string) *postgres.PostgresContainer {
 		initPostgresContainer(prefix)
 	}
 	return pgContainer
+}
+
+func CreateTestConnection(prefix string) *sqlx.DB {
+	ctx := context.Background()
+	connString, err := GetDatabaseContainer(prefix).ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		log.Fatal("error creating connection string" + err.Error())
+	}
+	connection, err := sqlx.Open("postgres", connString)
+	if err != nil {
+		log.Fatal("error opening connection" + err.Error())
+	}
+	slog.Info("successful creating of test container")
+	return connection
 }
