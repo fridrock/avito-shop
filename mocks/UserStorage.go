@@ -60,6 +60,34 @@ func (_m *UserStorage) FindUserByUsername(_a0 string) (storage.User, error) {
 	return r0, r1
 }
 
+// GetUserById provides a mock function with given fields: _a0
+func (_m *UserStorage) GetUserById(_a0 uuid.UUID) (storage.User, error) {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetUserById")
+	}
+
+	var r0 storage.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (storage.User, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) storage.User); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Get(0).(storage.User)
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // SaveUser provides a mock function with given fields: _a0
 func (_m *UserStorage) SaveUser(_a0 storage.User) (uuid.UUID, error) {
 	ret := _m.Called(_a0)

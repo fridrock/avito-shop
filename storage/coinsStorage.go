@@ -33,6 +33,7 @@ func (sc *CoinStorageImpl) SendCoin(amount int, curUserId uuid.UUID, toUserId uu
 	if err != nil {
 		return err
 	}
+
 	// creating transaction log
 	q = `INSERT INTO coin_transactions(transaction_id, from_id, to_id, amount_of_coins) VALUES ($1, $2, $3, $4)`
 	_, err = tx.Exec(q,

@@ -24,7 +24,7 @@ func main() {
 	sendCoinHandler := handlers.NewSendCoinHandler(coinStorage, userStorage)
 	productStorage := storage.NewProductStorage(conn)
 	infoStorage := storage.NewInfoStorage(conn)
-	infoHandler := handlers.NewInfoHandler(infoStorage)
+	infoHandler := handlers.NewInfoHandler(infoStorage, userStorage)
 	buyHandler := handlers.NewBuyHandler(productStorage, userStorage)
 	router := mux.NewRouter()
 	router.Handle("/api/auth", utils.HandleErrorMiddleware(authHandler.Auth)).Methods("POST")

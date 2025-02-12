@@ -1,9 +1,7 @@
 package storage
 
 import (
-	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -49,9 +47,6 @@ func (bs *ProductStorageImpl) FindProductByName(itemName string) (Product, error
 	q := `SELECT * FROM products WHERE product_name = $1`
 	var product Product
 	err := bs.db.Get(&product, q, itemName)
-	if err == sql.ErrNoRows {
-		err = errors.Join(err, fmt.Errorf("no such product"))
-	}
 	return product, err
 }
 

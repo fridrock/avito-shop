@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -20,6 +21,7 @@ type UserStorage interface {
 	FindUserByUsername(string) (User, error)
 	SaveUser(User) (uuid.UUID, error)
 	CheckEnoughCoins(int, uuid.UUID) bool
+	GetUserById(uuid.UUID) (User, error)
 }
 
 type UserStorageImpl struct {
@@ -52,9 +54,17 @@ func (as *UserStorageImpl) CheckEnoughCoins(amount int, userId uuid.UUID) bool {
 	var coins int
 	err := as.db.Get(&coins, q, userId.String())
 	if err != nil {
+		slog.Debug(fmt.Sprintf("error getting user coins with id : %v, err: %v", userId.String(), err.Error()))
 		return false
 	}
 	return coins >= amount
+}
+
+func (as *UserStorageImpl) GetUserById(userId uuid.UUID) (User, error) {
+	q := `SELECT * FROM users WHERE id = $1`
+	var user User
+	err := as.db.Get(&user, q, userId.String())
+	return user, err
 }
 
 func NewUserStorage(db *sqlx.DB) UserStorage {
