@@ -34,6 +34,7 @@ func MakeAuthRequest(serverUrl string, body string) (int, api.AuthResponse, api.
 		return resp.StatusCode, authResponse, errorResponse, fmt.Errorf("error getting body")
 	}
 	err = json.Unmarshal(responseBody, &authResponse)
+
 	return resp.StatusCode, authResponse, errorResponse, err
 }
 

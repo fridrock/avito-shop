@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/fridrock/avito-shop/auth"
@@ -25,6 +27,10 @@ func main() {
 		Handler:      router,
 	}
 	slog.Info("Starting server on port 8000")
+	go func() {
+		TestRPS()
+	}()
+	defer server.Close()
 	server.ListenAndServe()
 }
 
@@ -45,4 +51,50 @@ func setupRouter(conn *sqlx.DB) *mux.Router {
 	router.Handle("/api/buy/{item}", utils.HandleErrorMiddleware(authManager.AuthMiddleware(buyHandler.Buy))).Methods("GET")
 	router.Handle("/api/info", utils.HandleErrorMiddleware(authManager.AuthMiddleware(infoHandler.GetInfo))).Methods("GET")
 	return router
+}
+
+func measureRPS(requests int, duration time.Duration) {
+	var wg sync.WaitGroup
+	rpsChannel := make(chan int)
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	go func() {
+		var total int
+		for {
+			select {
+			case <-rpsChannel:
+				total += 4
+			case <-ticker.C:
+				fmt.Printf("Current RPS: %d\n", total)
+				total = 0
+			}
+		}
+	}()
+
+	startTime := time.Now()
+	for time.Since(startTime) < duration {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, authResponse, _, _ := MakeAuthRequest("http://localhost:8000", `{"username":"user1", "password":"user1"}`)
+			_, _, _, _ = MakeGetInfoRequest("http://localhost:8000", authResponse.Token)
+			_, _, _ = MakeSendCoinRequest("http://localhost:8000", authResponse.Token, `{"toUser":"user2", "amount":10}`)
+			_, _, _ = MakeBuyRequest("http://localhost:8000", authResponse.Token, "wallet")
+
+			rpsChannel <- 1
+
+		}()
+		time.Sleep(time.Second / time.Duration(requests))
+	}
+
+	wg.Wait()
+	close(rpsChannel)
+}
+
+func TestRPS() {
+	requestRate := 1000
+	testDuration := 20 * time.Second
+
+	measureRPS(requestRate, testDuration)
 }

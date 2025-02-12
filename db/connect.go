@@ -18,6 +18,7 @@ func CreateConnection() *sqlx.DB {
 		log.Fatal("Error opening database connection")
 	}
 	slog.Info("Created postgresql connection")
+	db.SetMaxOpenConns(20)
 	return db
 }
 

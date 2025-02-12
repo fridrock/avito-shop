@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"log/slog"
 	"net/http"
 
 	"github.com/fridrock/avito-shop/api"
@@ -15,7 +14,7 @@ func HandleErrorMiddleware(h HandlerWithError) http.Handler {
 		status, err := h(w, r)
 		if err != nil {
 			w.WriteHeader(status)
-			slog.Error(err.Error())
+			// slog.Error(err.Error())
 			errorResponse := api.ErrorResponse{
 				Errors: err.Error(),
 			}
