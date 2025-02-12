@@ -26,6 +26,9 @@ func (sc *SendCoinHandlerImpl) SendCoin(w http.ResponseWriter, r *http.Request) 
 		return http.StatusBadRequest, err
 	}
 	//get user balance
+	if sendCoinRequest.Amount < 1 {
+		return http.StatusBadRequest, fmt.Errorf("can't send zero > coins")
+	}
 	curUserId := auth.UserFromContext(r.Context())
 	hasEnoughCoins := sc.userStorage.CheckEnoughCoins(sendCoinRequest.Amount, curUserId)
 	//user with toUser username exist
