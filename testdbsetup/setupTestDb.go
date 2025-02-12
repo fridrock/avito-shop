@@ -1,4 +1,4 @@
-package storage
+package testdbsetup
 
 import (
 	"context"
@@ -16,7 +16,7 @@ var (
 	pgContainer *postgres.PostgresContainer
 )
 
-func initPostgresContainer() {
+func initPostgresContainer(prefix string) {
 	ctx := context.Background()
 
 	dbName := "shop"
@@ -25,7 +25,7 @@ func initPostgresContainer() {
 
 	containerCreated, err := postgres.Run(ctx,
 		"postgres:latest",
-		postgres.WithInitScripts(filepath.Join("./", "testInit.sql")),
+		postgres.WithInitScripts(filepath.Join(prefix, "migrations", "testInit.sql")),
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
@@ -40,9 +40,9 @@ func initPostgresContainer() {
 	pgContainer = containerCreated
 }
 
-func GetDatabaseContainer() *postgres.PostgresContainer {
+func GetDatabaseContainer(prefix string) *postgres.PostgresContainer {
 	if pgContainer == nil {
-		initPostgresContainer()
+		initPostgresContainer(prefix)
 	}
 	return pgContainer
 }
