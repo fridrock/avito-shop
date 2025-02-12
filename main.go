@@ -18,7 +18,7 @@ func main() {
 	defer conn.Close()
 	userStorage := storage.NewUserStorage(conn)
 	tokenService := auth.NewTokenService()
-	authHandler := handlers.NewAuthHandler(userStorage, tokenService)
+	authHandler := handlers.NewAuthHandler(userStorage, tokenService, utils.NewPasswordHasher())
 	authManager := auth.NewAuthManager(tokenService)
 	coinStorage := storage.NewCoinStorage(conn)
 	sendCoinHandler := handlers.NewSendCoinHandler(coinStorage, userStorage)

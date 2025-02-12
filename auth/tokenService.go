@@ -45,9 +45,6 @@ func (ts *TokenServiceImpl) ValidateToken(tokenString string) (api.UserInfo, err
 	if err != nil {
 		return dto, err
 	}
-	if time.Now().After(parsed.exp.Time) {
-		return dto, fmt.Errorf("expired token %v", parsed.exp.Time)
-	}
 	dto.Id = parsed.id
 	dto.Username = parsed.username
 	return dto, nil

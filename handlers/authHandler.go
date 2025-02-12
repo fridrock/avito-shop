@@ -63,10 +63,10 @@ func (ah *AuthHandlerImpl) sendToken(w http.ResponseWriter, authRequest api.Auth
 	}
 	return utils.WriteEncoded(w, authResponse)
 }
-func NewAuthHandler(st storage.UserStorage, tokenService auth.TokenService) AuthHandler {
+func NewAuthHandler(st storage.UserStorage, tokenService auth.TokenService, ph utils.PasswordHasher) AuthHandler {
 	return &AuthHandlerImpl{
 		storage:        st,
 		tokenService:   tokenService,
-		passwordHasher: utils.NewPasswordHasher(),
+		passwordHasher: ph,
 	}
 }
