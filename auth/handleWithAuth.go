@@ -23,17 +23,17 @@ func UserFromContext(ctx context.Context) uuid.UUID {
 type AuthManager interface {
 	AuthMiddleware(h utils.HandlerWithError) utils.HandlerWithError
 }
-type AuthManagerImpl struct {
+type authManager struct {
 	tokenService TokenService
 }
 
 func NewAuthManager(tokenService TokenService) AuthManager {
-	return &AuthManagerImpl{
+	return &authManager{
 		tokenService: tokenService,
 	}
 }
 
-func (am AuthManagerImpl) getUserFromToken(r *http.Request) (api.UserInfo, error) {
+func (am authManager) getUserFromToken(r *http.Request) (api.UserInfo, error) {
 	var user api.UserInfo
 	// Извлечение заголовка Authorization
 	authHeader := r.Header.Get("Authorization")
@@ -54,7 +54,7 @@ func (am AuthManagerImpl) getUserFromToken(r *http.Request) (api.UserInfo, error
 	return user, nil
 }
 
-func (am AuthManagerImpl) AuthMiddleware(h utils.HandlerWithError) utils.HandlerWithError {
+func (am authManager) AuthMiddleware(h utils.HandlerWithError) utils.HandlerWithError {
 	return func(w http.ResponseWriter, r *http.Request) (int, error) {
 		user, err := am.getUserFromToken(r)
 		if err != nil {

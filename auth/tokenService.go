@@ -16,11 +16,11 @@ type TokenService interface {
 	ValidateToken(string) (api.UserInfo, error)
 }
 
-type TokenServiceImpl struct {
+type tokenService struct {
 	SECRET_KEY []byte
 }
 
-func (ts *TokenServiceImpl) GenerateToken(authRequest api.AuthRequest, userId uuid.UUID) (api.AuthResponse, error) {
+func (ts *tokenService) GenerateToken(authRequest api.AuthRequest, userId uuid.UUID) (api.AuthResponse, error) {
 	var dto api.AuthResponse
 	accessTokenString, err := ts.generateAccess(authRequest, userId)
 	if err != nil {
@@ -30,7 +30,7 @@ func (ts *TokenServiceImpl) GenerateToken(authRequest api.AuthRequest, userId uu
 	return dto, nil
 }
 
-func (ts *TokenServiceImpl) generateAccess(user api.AuthRequest, userId uuid.UUID) (string, error) {
+func (ts *tokenService) generateAccess(user api.AuthRequest, userId uuid.UUID) (string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":       userId,
 		"username": user.Username,
@@ -39,7 +39,7 @@ func (ts *TokenServiceImpl) generateAccess(user api.AuthRequest, userId uuid.UUI
 	return accessToken.SignedString(ts.SECRET_KEY)
 }
 
-func (ts *TokenServiceImpl) ValidateToken(tokenString string) (api.UserInfo, error) {
+func (ts *tokenService) ValidateToken(tokenString string) (api.UserInfo, error) {
 	var dto api.UserInfo
 	parsed, err := ts.parseToken(tokenString)
 	if err != nil {
@@ -56,7 +56,7 @@ type tokenParsed struct {
 	exp      *jwt.NumericDate
 }
 
-func (ts *TokenServiceImpl) parseToken(tokenString string) (tokenParsed, error) {
+func (ts *tokenService) parseToken(tokenString string) (tokenParsed, error) {
 	var dto tokenParsed
 	tokenObj, err := ts.checkSigning(tokenString)
 	if err != nil {
@@ -82,7 +82,7 @@ func (ts *TokenServiceImpl) parseToken(tokenString string) (tokenParsed, error) 
 	return dto, nil
 }
 
-func (ts *TokenServiceImpl) checkSigning(tokenString string) (*jwt.Token, error) {
+func (ts *tokenService) checkSigning(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -98,7 +98,7 @@ func NewTokenService() TokenService {
 		log.Fatalf("Can't load env variable: %v", varName)
 	}
 
-	return &TokenServiceImpl{
+	return &tokenService{
 		SECRET_KEY: []byte(secret),
 	}
 }

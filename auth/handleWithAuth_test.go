@@ -28,7 +28,7 @@ func TestGetUserFromToken(t *testing.T) {
 	tokenService, _ := prepareAuthManager(t)
 	// authorizedHandler := authManager.AuthMiddleware(someHandler)
 	req := httptest.NewRequest("GET", "http://example.com", nil)
-	authManager := AuthManagerImpl{
+	authManager := authManager{
 		tokenService: tokenService,
 	}
 	_, err := authManager.getUserFromToken(req)

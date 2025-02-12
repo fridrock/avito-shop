@@ -13,12 +13,12 @@ type BuyHandler interface {
 	Buy(w http.ResponseWriter, r *http.Request) (int, error)
 }
 
-type BuyHandlerImpl struct {
+type buyHandler struct {
 	productStorage storage.ProductStorage
 	userStorage    storage.UserStorage
 }
 
-func (bh *BuyHandlerImpl) Buy(w http.ResponseWriter, r *http.Request) (int, error) {
+func (bh *buyHandler) Buy(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	userId := auth.UserFromContext(r.Context())
 	itemName := mux.Vars(r)["item"]
@@ -43,7 +43,7 @@ func (bh *BuyHandlerImpl) Buy(w http.ResponseWriter, r *http.Request) (int, erro
 }
 
 func NewBuyHandler(ps storage.ProductStorage, us storage.UserStorage) BuyHandler {
-	return &BuyHandlerImpl{
+	return &buyHandler{
 		productStorage: ps,
 		userStorage:    us,
 	}

@@ -11,12 +11,12 @@ type CoinStorage interface {
 	SendCoin(int, uuid.UUID, uuid.UUID) error
 }
 
-type CoinStorageImpl struct {
+type coinStorage struct {
 	db *sqlx.DB
 }
 
 // TODO refactor
-func (sc *CoinStorageImpl) SendCoin(amount int, curUserId uuid.UUID, toUserId uuid.UUID) error {
+func (sc *coinStorage) SendCoin(amount int, curUserId uuid.UUID, toUserId uuid.UUID) error {
 	tx, err := sc.db.Begin()
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (sc *CoinStorageImpl) SendCoin(amount int, curUserId uuid.UUID, toUserId uu
 }
 
 func NewCoinStorage(db *sqlx.DB) CoinStorage {
-	return &CoinStorageImpl{
+	return &coinStorage{
 		db: db,
 	}
 }

@@ -15,12 +15,12 @@ type SendCoinHandler interface {
 	SendCoin(w http.ResponseWriter, r *http.Request) (int, error)
 }
 
-type SendCoinHandlerImpl struct {
+type sendCoinHandler struct {
 	coinStorage storage.CoinStorage
 	userStorage storage.UserStorage
 }
 
-func (sc *SendCoinHandlerImpl) SendCoin(w http.ResponseWriter, r *http.Request) (int, error) {
+func (sc *sendCoinHandler) SendCoin(w http.ResponseWriter, r *http.Request) (int, error) {
 	sendCoinRequest, err := utils.Parse[api.SendCoinRequest](r)
 	if err != nil {
 		return http.StatusBadRequest, err
@@ -52,7 +52,7 @@ func (sc *SendCoinHandlerImpl) SendCoin(w http.ResponseWriter, r *http.Request) 
 }
 
 func NewSendCoinHandler(cs storage.CoinStorage, us storage.UserStorage) SendCoinHandler {
-	return &SendCoinHandlerImpl{
+	return &sendCoinHandler{
 		coinStorage: cs,
 		userStorage: us,
 	}

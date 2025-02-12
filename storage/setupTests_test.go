@@ -8,17 +8,17 @@ import (
 )
 
 var (
-	userStorage    UserStorage
-	coinStorage    CoinStorage
-	productStorage ProductStorage
-	conn           *sqlx.DB
+	userST    UserStorage
+	coinST    CoinStorage
+	productST ProductStorage
+	conn      *sqlx.DB
 )
 
 func TestMain(m *testing.M) {
 	conn = testdbsetup.CreateTestConnection("..")
 	defer conn.Close()
-	userStorage = NewUserStorage(conn)
-	coinStorage = NewCoinStorage(conn)
-	productStorage = NewProductStorage(conn)
+	userST = NewUserStorage(conn)
+	coinST = NewCoinStorage(conn)
+	productST = NewProductStorage(conn)
 	m.Run()
 }

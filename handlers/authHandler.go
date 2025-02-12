@@ -17,13 +17,13 @@ type AuthHandler interface {
 	Auth(w http.ResponseWriter, r *http.Request) (int, error)
 }
 
-type AuthHandlerImpl struct {
+type authHandler struct {
 	storage        storage.UserStorage
 	tokenService   auth.TokenService
 	passwordHasher utils.PasswordHasher
 }
 
-func (ah *AuthHandlerImpl) Auth(w http.ResponseWriter, r *http.Request) (int, error) {
+func (ah *authHandler) Auth(w http.ResponseWriter, r *http.Request) (int, error) {
 	authRequest, err := utils.Parse[api.AuthRequest](r)
 	if err != nil {
 		return http.StatusBadRequest, err
@@ -56,7 +56,7 @@ func (ah *AuthHandlerImpl) Auth(w http.ResponseWriter, r *http.Request) (int, er
 	}
 }
 
-func (ah *AuthHandlerImpl) sendToken(w http.ResponseWriter, authRequest api.AuthRequest, userId uuid.UUID) (int, error) {
+func (ah *authHandler) sendToken(w http.ResponseWriter, authRequest api.AuthRequest, userId uuid.UUID) (int, error) {
 	authResponse, err := ah.tokenService.GenerateToken(authRequest, userId)
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -64,7 +64,7 @@ func (ah *AuthHandlerImpl) sendToken(w http.ResponseWriter, authRequest api.Auth
 	return utils.WriteEncoded(w, authResponse)
 }
 func NewAuthHandler(st storage.UserStorage, tokenService auth.TokenService, ph utils.PasswordHasher) AuthHandler {
-	return &AuthHandlerImpl{
+	return &authHandler{
 		storage:        st,
 		tokenService:   tokenService,
 		passwordHasher: ph,

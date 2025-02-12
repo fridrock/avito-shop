@@ -12,12 +12,12 @@ type InfoHandler interface {
 	GetInfo(w http.ResponseWriter, r *http.Request) (int, error)
 }
 
-type InfoHandlerImpl struct {
+type getInfoHandler struct {
 	infoStorage storage.InfoStorage
 	userStorage storage.UserStorage
 }
 
-func (ih *InfoHandlerImpl) GetInfo(w http.ResponseWriter, r *http.Request) (int, error) {
+func (ih *getInfoHandler) GetInfo(w http.ResponseWriter, r *http.Request) (int, error) {
 	userId := auth.UserFromContext(r.Context())
 	user, err := ih.userStorage.GetUserById(userId)
 	if err != nil {
@@ -32,7 +32,7 @@ func (ih *InfoHandlerImpl) GetInfo(w http.ResponseWriter, r *http.Request) (int,
 }
 
 func NewInfoHandler(is storage.InfoStorage, us storage.UserStorage) InfoHandler {
-	return &InfoHandlerImpl{
+	return &getInfoHandler{
 		infoStorage: is,
 		userStorage: us,
 	}
