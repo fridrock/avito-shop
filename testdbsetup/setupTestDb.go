@@ -60,5 +60,6 @@ func CreateTestConnection(prefix string) *sqlx.DB {
 		log.Fatal("error opening connection" + err.Error())
 	}
 	slog.Info("successful creating of test container")
+	connection.SetMaxOpenConns(30)
 	return connection
 }
